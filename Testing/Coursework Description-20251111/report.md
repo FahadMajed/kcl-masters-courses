@@ -118,6 +118,33 @@ I created 8 test cases to systematically verify the tiered discount logic with b
 | DiscountService | Line 30        | **Incorrect threshold value**, Uses `total > 1000` instead of `total > 2000` for the 15% discount tier. This causes the 15% discount to be incorrectly applied to any subtotal above £1000, affecting the £1001-£2000 price range.   | `test_no_discount_at_1999`         |
 | DiscountService | Lines 17-23    | **Bundle discount bug** (from Requirement 3), Applies discount to laptops instead of mice, causing incorrect subtotals to be passed to tiered discount logic. This cascades into all tests that combine bundle and tiered discounts. | All`*_with_bundle` test cases      |
 
+### 3.5 Requirement 5: Customer Categories
+
+"The system shall categorize customers into three types: Regular, Premium, and VIP, with Premium customers receiving an additional 10% discount and VIP customers receiving an additional 15% discount on their total."
+
+**Test Cases Designed:**
+
+I created 6 test cases focused on testing customer category discounts in isolation (avoiding other discount types):
+
+1. `test_regular_customer_no_additional_discount` - Single item, no discount (PASSED)
+2. `test_premium_customer_gets_10_percent_discount` - Single item, 10% discount (FAILED)
+3. `test_vip_customer_gets_15_percent_discount` - Single item, 15% discount (PASSED)
+4. `test_regular_customer_with_multiple_items` - Multiple items, no discount (PASSED)
+5. `test_premium_customer_with_multiple_items` - Multiple items, 10% discount (FAILED)
+6. `test_vip_customer_with_multiple_items` - Multiple items, 15% discount (PASSED)
+
+**Detected Faults:**
+
+| Class Name      | Line Number(s) | Description of Fault                                                                                                                                                                                                                | Test Case(s) That Expose the Fault                                                            |
+| --------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| DiscountService | Line 35        | **Incorrect discount percentage**, Uses `discount += 0.20` (20%) instead of `discount += 0.10` (10%) for Premium customers. This gives Premium customers double the intended discount, contradicting the requirement specification. | `test_premium_customer_gets_10_percent_discount`, `test_premium_customer_with_multiple_items` |
+
+For `test_premium_customer_gets_10_percent_discount`:
+- Expected: £500 × 0.90 = £450.00
+- Actual: £500 × 0.80 = £400.00 (20% discount instead of 10%)
+
+Regular and VIP customers work correctly, but Premium customers receive 20% discount instead of the required 10%.
+
 ---
 
 ## 4. Testing Challenges and Trade-offs
