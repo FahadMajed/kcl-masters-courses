@@ -89,6 +89,35 @@ The tests used carefully chosen prices (£200 laptops, £150 laptops for tests 5
 
 These two bugs compound each other, not only is the wrong product type being discounted, but only one unit is discounted regardless of how many pairs should exist according to the requirement.
 
+### 3.4 Requirement 4: Tiered Discounts
+
+"The system shall apply tiered discounts based on the cart subtotal after bundle discounts:
+• 15% off if the subtotal exceeds £2,000
+• 20% off if the subtotal exceeds £7,000
+• 25% off if the subtotal exceeds £15,000"
+
+This requirement introduces tiered discounts that should be applied after bundle discounts. The system should select the highest applicable tier based on the subtotal, and the discount should only apply when the subtotal strictly exceeds (is greater than) the threshold.
+
+**Test Cases Designed:**
+
+I created 8 test cases to systematically verify the tiered discount logic with boundary testing and scenarios combining bundle discounts:
+
+1. `test_no_tiered_discount_below_threshold` - £500 subtotal, well below any threshold (PASSED)
+2. `test_no_discount_at_1999` - £1999 subtotal, just below £2000 threshold, should get no discount (FAILED)
+3. `test_apply_15_without_bundle` - £2001 subtotal exceeds £2000, should get 15% off (PASSED)
+4. `test_apply_15_with_bundle` - Bundle discount brings subtotal above £2000 (FAILED)
+5. `test_apply_20_without_bundle` - £7001 subtotal exceeds £7000, should get 20% off (PASSED)
+6. `test_apply_20_with_bundle` - Bundle discount brings subtotal above £7000 (FAILED)
+7. `test_apply_25_without_bundle` - £15001 subtotal exceeds £15000, should get 25% off (PASSED)
+8. `test_apply_25_with_bundle` - Bundle discount brings subtotal above £15000 (FAILED)
+
+**Detected Faults:**
+
+| Class Name      | Line Number(s) | Description of Fault                                                                                                                                                                                                                 | Test Case(s) That Expose the Fault |
+| --------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| DiscountService | Line 30        | **Incorrect threshold value**, Uses `total > 1000` instead of `total > 2000` for the 15% discount tier. This causes the 15% discount to be incorrectly applied to any subtotal above £1000, affecting the £1001-£2000 price range.   | `test_no_discount_at_1999`         |
+| DiscountService | Lines 17-23    | **Bundle discount bug** (from Requirement 3), Applies discount to laptops instead of mice, causing incorrect subtotals to be passed to tiered discount logic. This cascades into all tests that combine bundle and tiered discounts. | All`*_with_bundle` test cases      |
+
 ---
 
 ## 4. Testing Challenges and Trade-offs
