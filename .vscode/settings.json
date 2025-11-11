@@ -1,0 +1,16 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/analysis_options.yaml": true,
+    "**/linux": true,
+    "**/macos": true,
+    "**/windows": true,
+    "/web": true,
+    "b**/web": true
+  },
+  "hide-files.files": []
+}
