@@ -122,9 +122,11 @@ I created 8 test cases to systematically verify the tiered discount logic with b
 
 "The system shall categorize customers into three types: Regular, Premium, and VIP, with Premium customers receiving an additional 10% discount and VIP customers receiving an additional 15% discount on their total."
 
+This requirement introduces customer-specific discounts that should be applied based on customer type. To properly isolate and test this functionality, I focused exclusively on customer category discounts without combining them with other discount types (bundle or tiered).
+
 **Test Cases Designed:**
 
-I created 6 test cases focused on testing customer category discounts in isolation (avoiding other discount types):
+I created 6 test cases to verify customer category discounts work correctly in isolation:
 
 1. `test_regular_customer_no_additional_discount` - Single item, no discount (PASSED)
 2. `test_premium_customer_gets_10_percent_discount` - Single item, 10% discount (FAILED)
@@ -140,10 +142,70 @@ I created 6 test cases focused on testing customer category discounts in isolati
 | DiscountService | Line 35        | **Incorrect discount percentage**, Uses `discount += 0.20` (20%) instead of `discount += 0.10` (10%) for Premium customers. This gives Premium customers double the intended discount, contradicting the requirement specification. | `test_premium_customer_gets_10_percent_discount`, `test_premium_customer_with_multiple_items` |
 
 For `test_premium_customer_gets_10_percent_discount`:
+
 - Expected: £500 × 0.90 = £450.00
 - Actual: £500 × 0.80 = £400.00 (20% discount instead of 10%)
 
 Regular and VIP customers work correctly, but Premium customers receive 20% discount instead of the required 10%.
+
+### 3.6 Requirement 6: Coupon Codes
+
+"The system shall allow users to enter a single coupon code per transaction. Available coupons:
+• "DISCOUNT10" for 10% off
+• "SAVE50" for £50 off."
+
+**Test Cases Designed:**
+
+I created 9 test cases to verify coupon code functionality:
+
+1. `test_no_coupon_code` - No coupon applied (PASSED)
+2. `test_discount10_coupon` - DISCOUNT10 gives 10% off (PASSED)
+3. `test_save50_coupon` - SAVE50 gives £50 off (PASSED)
+4. `test_invalid_coupon_code` - Invalid coupon is ignored (PASSED)
+5. `test_empty_coupon_code` - Empty string coupon is ignored (PASSED)
+6. `test_discount10_with_multiple_items` - DISCOUNT10 works with multiple items (PASSED)
+7. `test_save50_with_multiple_items` - SAVE50 works with multiple items (PASSED)
+8. `test_case_sensitivity_discount10` - Lowercase "discount10" is rejected (PASSED)
+9. `test_single_coupon_per_transaction` - Only one coupon applies (last one wins) (PASSED)
+
+No bugs found, All 9 tests passed. The coupon code functionality is implemented correctly.
+
+### 3.7 Requirement 7: Time-Limited Promotions & Requirement 8: Discount Order
+
+**Requirement 7:** "The system shall support time-limited promotions that can be activated or deactivated. During an active promotion, a flat discount of 25% shall be applied. This discount shall be applied in addition to any other applicable discounts."
+
+**Requirement 8:** "Discounts shall be applied in the following order. First, bundle discounts and fixed-amount coupon discounts are applied, reducing the overall total of the order. Next, all percentage-based discounts (including tiered cart value discounts, customer type discounts, percentage-based coupon codes, and time-limited promotions) are applied to the updated total."
+
+These two requirements are closely related and tested together. Requirement 7 introduces promotional periods with 25% off, while Requirement 8 defines the precise order in which all discount types should be applied.
+
+**Test Cases Designed:**
+
+I created 9 test cases to verify promotion activation/deactivation and discount ordering:
+
+1. `test_no_promotion_active` - No promotion, no discount (PASSED)
+2. `test_promotion_active` - Promotion gives 25% off (PASSED)
+3. `test_promotion_with_multiple_items` - Promotion works with multiple items (PASSED)
+4. `test_promotion_combines_with_tiered_discount` - Promotion (25%) combines with tiered (15%) = 40% total (FAILED)
+5. `test_promotion_toggle_off` - Promotion can be deactivated (PASSED)
+6. `test_discount_order_bundle_then_percentage` - Bundle first, then promotion percentage (FAILED)
+7. `test_discount_order_fixed_coupon_then_percentage` - Fixed coupon first, then promotion (FAILED)
+8. `test_discount_order_percentage_coupon_with_promotion` - Percentage coupon combines with promotion (FAILED)
+9. `test_discount_order_all_types_combined` - All discount types in correct order (FAILED)
+
+**Detected Faults:**
+
+| Class Name    | Line Number(s) | Description of Fault                                                                                                                                                                                                                                                                                                             | Test Case(s) That Expose the Fault                                                                                                                                                                                 |
+| ------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ShoppingCart  | Lines 42-46    | **Incorrect promotion logic**, When promotion is active, the code uses an if/else structure that ONLY applies the 25% promotion discount via `apply_promotion_discount()` and completely skips all other discounts (bundle, tiered, customer type, coupons). This violates both requirements which state promotions should combine with other discounts. | `test_promotion_combines_with_tiered_discount`, `test_discount_order_bundle_then_percentage`, `test_discount_order_fixed_coupon_then_percentage`, `test_discount_order_percentage_coupon_with_promotion`, `test_discount_order_all_types_combined` |
+
+For `test_discount_order_all_types_combined` (VIP customer, laptop + mouse, SAVE50 coupon, promotion active):
+
+- Expected calculation following Requirement 8:
+  - Total: £3000 + £100 = £3100
+  - Bundle discount (10% off mouse): £3100 - £10 = £3090
+  - Fixed coupon (SAVE50): £3090 - £50 = £3040
+  - Percentage discounts combined (15% tiered + 15% VIP + 25% promotion = 55%): £3040 × 0.45 = £1368.00
+- Actual: £2325.00 (only 25% promotion applied, all other discounts ignored)
 
 ---
 

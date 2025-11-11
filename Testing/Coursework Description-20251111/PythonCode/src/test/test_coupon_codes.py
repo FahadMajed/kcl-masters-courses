@@ -66,7 +66,7 @@ def test_invalid_coupon_code():
 
     # ACT
     cart.add_item(CartItem(mouse, 1))
-    cart.apply_coupon("INVALID123")
+    cart.apply_coupon_code("INVALID123")
 
     # ASSERT: Invalid coupon, no discount applied
     assert cart.calculate_total() == 500.00
@@ -81,7 +81,7 @@ def test_empty_coupon_code():
 
     # ACT
     cart.add_item(CartItem(mouse, 1))
-    cart.apply_coupon("")
+    cart.apply_coupon_code("")
 
     # ASSERT: Empty coupon, no discount applied
     assert cart.calculate_total() == 500.00
@@ -134,10 +134,32 @@ def test_case_sensitivity_discount10():
 
     # ACT
     cart.add_item(CartItem(mouse, 1))
-    cart.apply_coupon("discount10")  # lowercase
+    cart.apply_coupon_code("discount10")  # lowercase
 
     # ASSERT: Should check if case matters
     # If case-insensitive: 450.00, if case-sensitive: 500.00
     assert cart.calculate_total() == 500.00
     # Expecting no discount if case-sensitive
     assert cart.calculate_final_price() == 500.00
+
+
+def test_single_coupon_per_transaction():
+    # ARRANGE: Test that only ONE coupon can be applied per transaction
+    mouse = Product("Mouse", 1000.00, 20)
+    customer = Customer("Grace", CustomerType.REGULAR)
+    cart = ShoppingCart(customer, DiscountService())
+
+    # ACT: Try to apply two coupons
+    cart.add_item(CartItem(mouse, 1))
+    cart.apply_coupon_code("DISCOUNT10")  # First coupon: 10% off → 900
+    cart.apply_coupon_code("SAVE50")      # Second coupon: £50 off → 950
+
+    # ASSERT: Only ONE coupon should be applied (the last one or first one, depending on implementation)
+    # If last one wins: 1000 - 50 = 950
+    # If first one wins: 1000 * 0.90 = 900
+    # If both applied (BUG): 1000 * 0.90 - 50 = 850 or 1000 - 50 * 0.90 = 955
+    assert cart.calculate_total() == 1000.00
+    # Expected: Only one coupon should apply
+    # Based on ShoppingCart implementation, last coupon should overwrite first
+    final_price = cart.calculate_final_price()
+    assert final_price == 950.00  # Last coupon (SAVE50) should win
