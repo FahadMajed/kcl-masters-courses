@@ -1,4 +1,8 @@
-
+"""
+1. The system shall allow users to browse and select products to add to a shopping cart. 
+2. The  system  shall  calculate  the  total  price  of  items  in  the  shopping  cart  before 
+applying any discounts
+"""
 
 from Product import Product
 from ShoppingCart import ShoppingCart
@@ -9,7 +13,7 @@ from CustomerType import CustomerType
 
 
 def test_browsing_products():
-    # GIVEN A PRODUCT
+    # ARRANGE A PRODUCT
     productA = Product("Laptop", 999.99, 10)
 
     assert productA.get_name() == "Laptop"
@@ -19,11 +23,11 @@ def test_browsing_products():
 
 def test_add_product_to_cart():
 
-    # GIVEN A PRODUCT
-    productA = Product("Laptop", 999.99, 10)
+    # ARRANGE A PRODUCT
+    laptop = Product("Laptop", 999.99, 10)
     customer = Customer(name='Fahad', customer_type=CustomerType.REGULAR)
     cart = ShoppingCart(customer=customer, discount_service=DiscountService())
-    cartItem = CartItem(product=productA, quantity=1,)
+    cartItem = CartItem(product=laptop, quantity=1,)
     # ACT: A PRODUCT IS ADDED
     cart.add_item(cartItem)
 
@@ -33,14 +37,13 @@ def test_add_product_to_cart():
 
 def test_calculate_total_before_discounts():
 
-    # GIVEN: Multiple products in cart
+    # ARRANGE: Multiple products in cart
     laptop = Product("Laptop", 1000.00, 10)
     mouse = Product("Mouse", 50.00, 20)
     keyboard = Product("Keyboard", 150.00, 15)
 
     customer = Customer("John", CustomerType.REGULAR)
-    discount_service = DiscountService()
-    cart = ShoppingCart(customer, discount_service)
+    cart = ShoppingCart(customer, DiscountService())
 
     # ACT: Add multiple items with different quantities
     cart.add_item(CartItem(laptop, 2))      # 2 * 1000 = 2000

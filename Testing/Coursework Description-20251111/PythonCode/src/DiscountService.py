@@ -16,8 +16,10 @@ class DiscountService:
         # Apply bundle discounts (e.g., buy laptop + mouse, 5% off mouse)
         for item in cart_items:
             if item.get_product().get_name().casefold() != "mouse".casefold():
-                has_laptop = sum(1 for i in cart_items if i.get_product().get_name().casefold() == "laptop".casefold()) >= 1
+                has_laptop = sum(1 for i in cart_items if i.get_product(
+                ).get_name().casefold() == "laptop".casefold()) >= 1
                 if has_laptop:
+                    print(item.get_product().get_name())
                     total -= item.get_product().get_price() * 0.10  # 10% off the mouse
 
         # Apply multi-tier discount based on cart value
