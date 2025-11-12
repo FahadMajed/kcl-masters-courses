@@ -1,16 +1,10 @@
 # Software Testing Report: Shopping Cart System
 
-**Student Name:** Fahad Alhssan - KNUMBER
+**Student Name:** Fahad Alhssan - K25049365
 
 **Course:** 6CCS3SMT Software Measurement and Testing
 
-## Introduction
-
-This report documents my approach to testing the Shopping Cart system, a software application designed to handle online shopping with various discount mechanisms. The system includes features like bundle discounts, tiered pricing, customer-specific discounts, and promotional offers.
-
-The main goal of this coursework was to write comprehensive test cases that effectively identify faults in the provided codebase and document the testing process and decisions made along the way.
-
-## 2. Testing Approach
+## Testing Approach
 
 I used a requirements-based testing approach, creating test cases directly from the system requirements to ensure all specified functionality is validated.
 
@@ -27,9 +21,9 @@ for the framework, I chose **pytest** for Python testing because it provides cle
 
 ---
 
-## 3. Test Cases and Coverage
+## 2. Test Cases and Coverage
 
-### 3.1 Requirement 1: Browse and Select Products
+### Requirement 1: Browse and Select Products
 
 "The system shall allow users to browse and select products to add to a shopping cart."
 
@@ -42,7 +36,7 @@ I interpreted "browsing" as the ability to view product details (name, price, st
 
 These tests validate that the basic Product and ShoppingCart classes work correctly.
 
-### 3.2 Requirement 2: Calculate Total Before Discounts
+### Requirement 2: Calculate Total Before Discounts
 
 "The system shall calculate the total price of items in the shopping cart before applying any discounts."
 
@@ -59,7 +53,7 @@ This test uses:
 
 The test passed, confirming this requirement is implemented correctly.
 
-### 3.3 Requirement 3: Bundle Discount (Mouse-Laptop Pairs)
+### Requirement 3: Bundle Discount (Mouse-Laptop Pairs)
 
 "The system shall apply a bundle discount: 10% off the price of each mouse if at least one laptop is in the cart. This discount applies for all mouse-laptop pairs."
 
@@ -89,7 +83,7 @@ The tests used carefully chosen prices (£200 laptops, £150 laptops for tests 5
 
 These two bugs compound each other, not only is the wrong product type being discounted, but only one unit is discounted regardless of how many pairs should exist according to the requirement.
 
-### 3.4 Requirement 4: Tiered Discounts
+### Requirement 4: Tiered Discounts
 
 "The system shall apply tiered discounts based on the cart subtotal after bundle discounts:
 • 15% off if the subtotal exceeds £2,000
@@ -118,7 +112,7 @@ I created 8 test cases to systematically verify the tiered discount logic with b
 | DiscountService | Line 30        | **Incorrect threshold value**, Uses `total > 1000` instead of `total > 2000` for the 15% discount tier. This causes the 15% discount to be incorrectly applied to any subtotal above £1000, affecting the £1001-£2000 price range.   | `test_no_discount_at_1999`         |
 | DiscountService | Lines 17-23    | **Bundle discount bug** (from Requirement 3), Applies discount to laptops instead of mice, causing incorrect subtotals to be passed to tiered discount logic. This cascades into all tests that combine bundle and tiered discounts. | All`*_with_bundle` test cases      |
 
-### 3.5 Requirement 5: Customer Categories
+### Requirement 5: Customer Categories
 
 "The system shall categorize customers into three types: Regular, Premium, and VIP, with Premium customers receiving an additional 10% discount and VIP customers receiving an additional 15% discount on their total."
 
@@ -148,7 +142,7 @@ For `test_premium_customer_gets_10_percent_discount`:
 
 Regular and VIP customers work correctly, but Premium customers receive 20% discount instead of the required 10%.
 
-### 3.6 Requirement 6: Coupon Codes
+### Requirement 6: Coupon Codes
 
 "The system shall allow users to enter a single coupon code per transaction. Available coupons:
 • "DISCOUNT10" for 10% off
@@ -170,7 +164,7 @@ I created 9 test cases to verify coupon code functionality:
 
 No bugs found, All 9 tests passed. The coupon code functionality is implemented correctly.
 
-### 3.7 Requirement 7: Time-Limited Promotions & Requirement 8: Discount Order
+### Requirement 7: Time-Limited Promotions & Requirement 8: Discount Order
 
 **Requirement 7:** "The system shall support time-limited promotions that can be activated or deactivated. During an active promotion, a flat discount of 25% shall be applied. This discount shall be applied in addition to any other applicable discounts."
 
@@ -194,18 +188,9 @@ I created 9 test cases to verify promotion activation/deactivation and discount 
 
 **Detected Faults:**
 
-| Class Name    | Line Number(s) | Description of Fault                                                                                                                                                                                                                                                                                                             | Test Case(s) That Expose the Fault                                                                                                                                                                                 |
-| ------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ShoppingCart  | Lines 42-46    | **Incorrect promotion logic**, When promotion is active, the code uses an if/else structure that ONLY applies the 25% promotion discount via `apply_promotion_discount()` and completely skips all other discounts (bundle, tiered, customer type, coupons). This violates both requirements which state promotions should combine with other discounts. | `test_promotion_combines_with_tiered_discount`, `test_discount_order_bundle_then_percentage`, `test_discount_order_fixed_coupon_then_percentage`, `test_discount_order_percentage_coupon_with_promotion`, `test_discount_order_all_types_combined` |
-
-For `test_discount_order_all_types_combined` (VIP customer, laptop + mouse, SAVE50 coupon, promotion active):
-
-- Expected calculation following Requirement 8:
-  - Total: £3000 + £100 = £3100
-  - Bundle discount (10% off mouse): £3100 - £10 = £3090
-  - Fixed coupon (SAVE50): £3090 - £50 = £3040
-  - Percentage discounts combined (15% tiered + 15% VIP + 25% promotion = 55%): £3040 × 0.45 = £1368.00
-- Actual: £2325.00 (only 25% promotion applied, all other discounts ignored)
+| Class Name   | Line Number(s) | Description of Fault                                                                                                                                                                                                                                                                                                                                     | Test Case(s) That Expose the Fault                                                                                                                                                                                                                 |
+| ------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ShoppingCart | Lines 42-46    | **Incorrect promotion logic**, When promotion is active, the code uses an if/else structure that ONLY applies the 25% promotion discount via `apply_promotion_discount()` and completely skips all other discounts (bundle, tiered, customer type, coupons). This violates both requirements which state promotions should combine with other discounts. | `test_promotion_combines_with_tiered_discount`, `test_discount_order_bundle_then_percentage`, `test_discount_order_fixed_coupon_then_percentage`, `test_discount_order_percentage_coupon_with_promotion`, `test_discount_order_all_types_combined` |
 
 ### 3.8 Requirement 9: Receipt Printing
 
@@ -228,65 +213,105 @@ I created 8 test cases to verify receipt printing functionality:
 
 No bugs found. All 8 tests passed. The receipt printing functionality is implemented correctly according to the requirement.
 
+### 3.9 Requirement 10: Payment Validation
+
+"The system shall display an error message if the credit card number does not meet the 16-digit requirement or if the transaction amount is zero or negative, preventing the transaction from proceeding."
+
+This requirement specifies validation rules for payment processing to prevent invalid transactions.
+
+**Test Cases Designed:**
+
+I created 10 test cases to verify payment validation:
+
+1. `test_valid_payment` - Valid 16-digit card and positive amount (PASSED)
+2. `test_card_less_than_16_digits` - 15-digit card should be rejected (FAILED)
+3. `test_card_more_than_16_digits` - 17-digit card should be rejected (FAILED)
+4. `test_zero_amount` - Zero amount should be rejected (FAILED)
+5. `test_negative_amount` - Negative amount should be rejected (FAILED)
+6. `test_invalid_card_and_zero_amount` - Both invalid card and zero amount (PASSED)
+7. `test_invalid_card_and_negative_amount` - Both invalid card and negative amount (PASSED)
+8. `test_empty_card_number` - Empty card number should be rejected (FAILED)
+9. `test_very_small_positive_amount` - £0.01 should be accepted (PASSED)
+10. `test_large_amount` - Large amount should be accepted (PASSED)
+
+**Detected Faults:**
+
+| Class Name     | Line Number(s) | Description of Fault                                                                                                                                                                                                                                                                                                                       | Test Case(s) That Expose the Fault                                                                                                     |
+| -------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| PaymentService | Line 5         | **Incorrect logical operator**, Uses `and` instead of `or` in the validation condition. The code checks `if len(credit_card_number) != 16 and amount <= 0`, meaning it only raises an exception when both conditions are true. The requirement states the error should occur if either condition is true (invalid card OR invalid amount). | `test_card_less_than_16_digits`, `test_card_more_than_16_digits`, `test_zero_amount`, `test_negative_amount`, `test_empty_card_number` |
+
 ---
 
 ## 4. Testing Challenges and Trade-offs
 
 ### 4.1 Challenges Faced
 
-**1. Understanding the Pairing Logic**
+Initially, I misunderstood the requirement "applies for all mouse-laptop pairs." I thought all mice would get discounts if at least one laptop was present. After clarification, I learned it's a min(laptops, mice) pairing. This required me to redesign several test cases.
 
-Initially, I misunderstood the requirement "applies for all mouse-laptop pairs." I thought ALL mice would get discounts if at least one laptop was present. After clarification, I learned it's a min(laptops, mice) pairing system. This required me to redesign several test cases.
-
-**2. Test Isolation vs. Real-World Scenarios**
-
-I had to balance between:
-
-- Testing components in isolation (unit tests)
-- Testing realistic shopping scenarios (integration tests)
-
-I chose to focus on unit tests with realistic data, which helped identify bugs more precisely.
-
-**3. Handling Interdependent Discounts**
-
-The system has multiple discount types (bundle, tier, customer type, promotions) that interact with each other. I had to carefully calculate expected values by understanding the order in which discounts are applied.
+And in discounts test cases, the system had multiple discount types (bundle, tier, customer type, promotions) that interact with each other. I had to carefully calculate expected values by understanding the order in which discounts are applied.
 
 I even thought there was a bug in some requirements from discount calculation, but this was due to another discount being triggered.
 
 ### 4.2 Trade-offs
 
-**Coverage vs. Time:**
-I prioritized testing critical requirements (discounts, price calculations) over less critical ones (receipt printing). This was necessary given time constraints but means some edge cases may remain untested.
-
-**Test Readability vs. DRY Principle:**
-I repeated setup code in each test rather than using complex fixtures. This makes tests more verbose but easier to understand and maintain.
+Test Readability vs. DRY Principle, I repeated setup code in each test rather than reusing or refactoring the set up. This makes tests more verbose but easier to understand and maintain.
 
 ---
 
-## 6. Code Coverage
+## 5. Code Coverage
 
-_(Coverage report will be added here once generated)_
+I used **pytest-cov** (based on coverage.py) to measure code coverage. This tool tracks which lines of code are executed during test runs.
+
+**Coverage Report Summary:**
+
+| File                  | Statements | Missed | Coverage |
+| --------------------- | ---------- | ------ | -------- |
+| CartItem.py           | 10         | 1      | 90%      |
+| Customer.py           | 15         | 4      | 73%      |
+| CustomerType.py       | 5          | 0      | 100%     |
+| DiscountService.py    | 31         | 0      | 100%     |
+| PaymentService.py     | 5          | 0      | 100%     |
+| Product.py            | 17         | 4      | 76%      |
+| ShoppingCart.py       | 37         | 1      | 97%      |
+| InventoryService.py   | 7          | 7      | 0%       |
+| OrderService.py       | 17         | 17     | 0%       |
+| **TOTAL**             | **724**    | **39** | **95%**  |
+
+**Analysis:**
+
+- **Overall Coverage: 95%** - This is excellent coverage indicating comprehensive testing.
+- **Fully Tested (100%)**: CustomerType.py, DiscountService.py, PaymentService.py
+- **Well Tested (>90%)**: CartItem.py (90%), ShoppingCart.py (97%)
+- **Moderately Tested**: Product.py (76%), Customer.py (73%)
+- **Untested**: InventoryService.py (0%), OrderService.py (0%) - These classes were not part of the requirements so no tests were written for them.
+
+The high coverage for the main business logic classes (DiscountService, ShoppingCart, PaymentService) demonstrates that the test suite effectively exercises the critical functionality of the shopping cart system.
 
 ---
 
-## 7. Mocking Strategy
+## 6. Mocking Strategy
 
-_(To be completed as we progress)_
+I did not need to use any mocking, mocking will be helpful if we needed to test, for example, different payment scenarios. but the requirements and project were only focused on input validation. if we had to test how the system would react to payment failures due to insuffient funds, network errors and such, mocking would be useful, otherwise keeping it simple was the approach i went for.
 
 ---
 
-## 8. Conclusion
+## 7. Conclusion
 
-Through systematic requirements-based testing, I successfully identified a critical bug in the bundle discount implementation that affects the majority of test scenarios. The bug involves applying discounts to the wrong product type, demonstrating how well-designed test cases can effectively expose fundamental flaws in software logic.
+Through systematic requirements-based testing with **61 test cases** across 8 test suites, I successfully identified **5 distinct bugs** affecting 6 different requirements in the Shopping Cart system. The testing achieved **95% code coverage**, demonstrating comprehensive validation of the system's functionality.
+
+**Summary of Bugs Found:**
+
+1. **Bundle Discount (Req 3)**: Inverted condition applying discount to wrong product type, plus missing quantity handling
+2. **Tiered Discount (Req 4)**: Incorrect threshold value (>1000 instead of >2000)
+3. **Customer Categories (Req 5)**: Premium customers receive 20% instead of 10%
+4. **Promotions (Req 7 & 8)**: Uses `and` instead of `or` causing promotion to ignore other discounts
+5. **Payment Validation (Req 10)**: Uses `and` instead of `or` allowing invalid cards/amounts to pass
 
 The testing process highlighted the importance of:
+- Clearly understanding requirements before writing tests
+- Using boundary value testing to expose edge cases
+- Isolating features to identify bugs precisely
+- Testing both positive and negative scenarios
+- Systematic test organization by requirement
 
-1. Clearly understanding requirements before writing tests
-2. Testing both positive and negative scenarios
-3. Using descriptive test names and clear assertions
-4. Covering edge cases and boundary conditions
-
----
-
-**Word Count:** ~1,200 words
-_(Target: 2000 words max)_
+The test suite provides a strong foundation for validating bug fixes and preventing regressions in future development.

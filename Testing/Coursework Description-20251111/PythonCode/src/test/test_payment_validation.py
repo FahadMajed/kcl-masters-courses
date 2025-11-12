@@ -26,7 +26,8 @@ def test_card_less_than_16_digits():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_card_more_than_16_digits():
@@ -38,7 +39,8 @@ def test_card_more_than_16_digits():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_zero_amount():
@@ -50,7 +52,8 @@ def test_zero_amount():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_negative_amount():
@@ -62,7 +65,8 @@ def test_negative_amount():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_invalid_card_and_zero_amount():
@@ -74,7 +78,8 @@ def test_invalid_card_and_zero_amount():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_invalid_card_and_negative_amount():
@@ -86,7 +91,8 @@ def test_invalid_card_and_negative_amount():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_empty_card_number():
@@ -98,7 +104,8 @@ def test_empty_card_number():
     # ACT & ASSERT: Should raise exception
     with pytest.raises(Exception) as exc_info:
         payment_service.process_payment(card_number, amount)
-    assert "Payment failed" in str(exc_info.value) or "Invalid" in str(exc_info.value)
+    assert "Payment failed" in str(
+        exc_info.value) or "Invalid" in str(exc_info.value)
 
 
 def test_very_small_positive_amount():
