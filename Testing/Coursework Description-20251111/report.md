@@ -207,6 +207,27 @@ For `test_discount_order_all_types_combined` (VIP customer, laptop + mouse, SAVE
   - Percentage discounts combined (15% tiered + 15% VIP + 25% promotion = 55%): £3040 × 0.45 = £1368.00
 - Actual: £2325.00 (only 25% promotion applied, all other discounts ignored)
 
+### 3.8 Requirement 9: Receipt Printing
+
+"The system shall print a detailed receipt summarising the items in the cart, the total price before discounts, and the final price after all applicable discounts."
+
+This requirement focuses on the output format and completeness of the receipt printed by the system.
+
+**Test Cases Designed:**
+
+I created 8 test cases to verify receipt printing functionality:
+
+1. `test_receipt_basic_format` - Receipt has header and item details (PASSED)
+2. `test_receipt_shows_total_before_discount` - Shows total before discounts (PASSED)
+3. `test_receipt_shows_final_price_after_discounts` - Shows final price after discounts (PASSED)
+4. `test_receipt_multiple_items` - All items listed correctly (PASSED)
+5. `test_receipt_with_quantity` - Quantity shown for items (PASSED)
+6. `test_receipt_with_coupon` - Both totals shown with coupon (PASSED)
+7. `test_receipt_empty_cart` - Receipt prints even when cart is empty (PASSED)
+8. `test_receipt_all_discount_types` - Receipt shows all items with complex discounts (PASSED)
+
+No bugs found. All 8 tests passed. The receipt printing functionality is implemented correctly according to the requirement.
+
 ---
 
 ## 4. Testing Challenges and Trade-offs
